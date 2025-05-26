@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تعديل المستخدم</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #fef9c3, #fde68a);
+      margin: 0; padding: 20px;
+      direction: rtl;
+    }
+    h1 { text-align: center; color: #b45309; }
+    form {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #b45309;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    .link {
+      margin-top: 10px;
+      text-align: center;
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    #langSwitch {
+      position: fixed;
+      top: 10px; left: 10px;
+      background: #b45309;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div id="langSwitch">Français</div>
+
+<h1 id="pageTitle">تعديل معلومات المستخدم</h1>
+
+<form id="editForm">
+  <label id="labelOldUser">اسم المستخدم الحالي</label>
+  <input type="text" id="oldUsername" required />
+
+  <label id="labelNewUser">اسم المستخدم الجديد</label>
+  <input type="text" id="newUsername" />
+
+  <label id="labelNewPass">كلمة المرور الجديدة</label>
+  <input type="password" id="newPassword" />
+
+  <button type="submit" id="updateBtn">تحديث</button>
+</form>
+
+<div class="link" onclick="location.href='index.html'" id="backLink">العودة لتسجيل الدخول</div>
+
+<script>
+  const texts = {
+    ar: {
+      langSwitch: 'Français',
+      pageTitle: 'تعديل معلومات المستخدم',
+      labelOldUser: 'اسم المستخدم الحالي',
+      labelNewUser: 'اسم المستخدم الجديد',
+      labelNewPass: 'كلمة المرور الجديدة',
+      updateBtn: 'تحديث',
+      backLink: 'العودة لتسجيل الدخول',
+      userNotFound: 'المستخدم غير موجود!',
+      updated: 'تم التحديث بنجاح.'
+    },
+    fr: {
+      langSwitch: 'العربية',
+      pageTitle: 'Modifier utilisateur',
+      labelOldUser: "Nom d'utilisateur actuel",
+      labelNewUser: "Nouveau nom d'utilisateur",
+      labelNewPass: 'Nouveau mot de passe',
+      updateBtn: 'Mettre à jour',
+      backLink: 'Retour à la connexion',
+      userNotFound: "Utilisateur introuvable !",
+      updated: 'Mis à jour avec succès.'
+    }
+  };
+
+  let currentLang = localStorage.getItem('lang') || 'ar';
+
+  function applyLang() {
+    const t = texts[currentLang];
+    document.getElementById('langSwitch').textContent = t.langSwitch;
+    document.getElementById('pageTitle').textContent = t.pageTitle;
+    document.getElementById('labelOldUser').textContent = t.labelOldUser;
+    document.getElementById('labelNewUser').textContent = t.labelNewUser;
+    document.getElementById('labelNewPass').textContent = t.labelNewPass;
+    document.getElementById('updateBtn').textContent = t.updateBtn;
+    document.getElementById('backLink').textContent = t.backLink;
+    document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  document.getElementById('langSwitch').onclick = () => {
+    currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+    localStorage.setItem('lang', currentLang);
+    applyLang();
+  };
+
+  applyLang();
+
+  document.getElementById('editForm').onsubmit = function(e) {
+    e.preventDefault();
+    const oldUsername = document.getElementById('oldUsername').value.trim();
+    const newUsername = document.getElementById('newUsername').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.username === oldUsername);
+
+    if (userIndex === -1) {
+      alert(texts[currentLang].userNotFound);
+      return;
+    }
+
+    if (newUsername) users[userIndex].username = newUsername;
+    if (newPassword) users[userIndex].password = newPassword;
+
+    localStorage.setItem('users', JSON.stringify(users));
+    alert(texts[currentLang].updated);
+    location.href = 'index.html';
+  };
+</script>
+
+</body>
+</html>

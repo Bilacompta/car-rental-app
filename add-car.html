@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>إضافة سيارة</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(to right, #d1fae5, #a7f3d0);
+      padding: 20px;
+      direction: rtl;
+    }
+    h2 {
+      text-align: center;
+      color: #065f46;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      background: #059669;
+      color: white;
+      border: none;
+      width: 100%;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .top-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .top-buttons button {
+      width: 48%;
+      background: #065f46;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-buttons">
+  <button onclick="goHome()" id="homeBtn">الصفحة الرئيسية</button>
+  <button onclick="switchLang()" id="langBtn">Français</button>
+</div>
+
+<h2 id="pageTitle">إضافة سيارة جديدة</h2>
+
+<form id="carForm">
+  <label id="labelName">اسم السيارة:</label>
+  <input type="text" id="carName" required>
+
+  <label id="labelType">نوع السيارة:</label>
+  <input type="text" id="carType" required>
+
+  <label id="labelPlate">لوحة الترقيم:</label>
+  <input type="text" id="carPlate" required>
+
+  <button type="submit" id="saveBtn">حفظ السيارة</button>
+</form>
+
+<script>
+  const texts = {
+    ar: {
+      homeBtn: "الصفحة الرئيسية",
+      langBtn: "Français",
+      pageTitle: "إضافة سيارة جديدة",
+      labelName: "اسم السيارة:",
+      labelType: "نوع السيارة:",
+      labelPlate: "لوحة الترقيم:",
+      saveBtn: "حفظ السيارة",
+      success: "تم حفظ السيارة بنجاح!"
+    },
+    fr: {
+      homeBtn: "Accueil",
+      langBtn: "العربية",
+      pageTitle: "Ajouter une voiture",
+      labelName: "Nom de la voiture:",
+      labelType: "Type de voiture:",
+      labelPlate: "Plaque d'immatriculation:",
+      saveBtn: "Enregistrer la voiture",
+      success: "Voiture enregistrée avec succès!"
+    }
+  };
+
+  let lang = localStorage.getItem("lang") || "ar";
+
+  function applyLang() {
+    const t = texts[lang];
+    document.getElementById("homeBtn").textContent = t.homeBtn;
+    document.getElementById("langBtn").textContent = t.langBtn;
+    document.getElementById("pageTitle").textContent = t.pageTitle;
+    document.getElementById("labelName").textContent = t.labelName;
+    document.getElementById("labelType").textContent = t.labelType;
+    document.getElementById("labelPlate").textContent = t.labelPlate;
+    document.getElementById("saveBtn").textContent = t.saveBtn;
+    document.body.dir = lang === "ar" ? "rtl" : "ltr";
+  }
+
+  function switchLang() {
+    lang = lang === "ar" ? "fr" : "ar";
+    localStorage.setItem("lang", lang);
+    applyLang();
+  }
+
+  function goHome() {
+    location.href = "home.html";
+  }
+
+  applyLang();
+
+  document.getElementById("carForm").onsubmit = function(e) {
+    e.preventDefault();
+    const carName = document.getElementById("carName").value.trim();
+    const carType = document.getElementById("carType").value.trim();
+    const carPlate = document.getElementById("carPlate").value.trim();
+
+    let cars = JSON.parse(localStorage.getItem("cars") || "[]");
+    cars.push({ name: carName, type: carType, plate: carPlate });
+    localStorage.setItem("cars", JSON.stringify(cars));
+
+    alert(texts[lang].success);
+    document.getElementById("carForm").reset();
+  };
+</script>
+
+</body>
+</html>

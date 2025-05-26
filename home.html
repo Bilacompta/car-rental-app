@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>الصفحة الرئيسية</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #80deea);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #006064;
+    }
+
+    button {
+      width: 220px;
+      padding: 15px;
+      margin: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #00838f;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>الصفحة الرئيسية</h1>
+
+  <button onclick="location.href='add-car.html'">إضافة السيارات</button>
+  <button onclick="location.href='reserve-car.html'">حجز السيارات</button>
+  <button onclick="location.href='all-car.html'">عرض السيارات</button>
+  <button onclick="location.href='archive.html'">أرشيف الحجز</button>
+  <button onclick="toggleLanguage()">تغيير اللغة</button>
+
+  <script>
+    function toggleLanguage() {
+      const currentLang = document.documentElement.lang;
+      if (currentLang === 'ar') {
+        document.documentElement.lang = 'fr';
+        document.documentElement.dir = 'ltr';
+        document.querySelector('h1').textContent = 'Page d\'accueil';
+        document.querySelectorAll('button')[0].textContent = 'Ajouter Voiture';
+        document.querySelectorAll('button')[1].textContent = 'Réserver Voiture';
+        document.querySelectorAll('button')[2].textContent = 'Voir les Voitures';
+        document.querySelectorAll('button')[3].textContent = 'Archives de Réservation';
+        document.querySelectorAll('button')[4].textContent = 'Changer la langue';
+      } else {
+        document.documentElement.lang = 'ar';
+        document.documentElement.dir = 'rtl';
+        document.querySelector('h1').textContent = 'الصفحة الرئيسية';
+        document.querySelectorAll('button')[0].textContent = 'إضافة السيارات';
+        document.querySelectorAll('button')[1].textContent = 'حجز السيارات';
+        document.querySelectorAll('button')[2].textContent = 'عرض السيارات';
+        document.querySelectorAll('button')[3].textContent = 'أرشيف الحجز';
+        document.querySelectorAll('button')[4].textContent = 'تغيير اللغة';
+      }
+    }
+  </script>
+
+</body>
+</html>

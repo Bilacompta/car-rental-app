@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>عرض السيارات</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #e1f5fe, #fffde7);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      color: #0277bd;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 14px 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-size: 16px;
+    }
+    th {
+      background-color: #0288d1;
+      color: white;
+      font-weight: 700;
+    }
+    tr:hover {
+      background-color: #f1f8ff;
+    }
+    button {
+      padding: 8px 14px;
+      margin: 2px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .edit {
+      background-color: #4caf50;
+      color: white;
+    }
+    .edit:hover {
+      background-color: #388e3c;
+    }
+    .save {
+      background-color: #2196f3;
+      color: white;
+    }
+    .save:hover {
+      background-color: #1976d2;
+    }
+    .delete {
+      background-color: #f44336;
+      color: white;
+    }
+    .delete:hover {
+      background-color: #d32f2f;
+    }
+    #backBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #0288d1;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<button id="backBtn" onclick="location.href='home.html'">الرئيسية</button>
+
+<h1>عرض السيارات المتوفرة</h1>
+
+<table id="carsTable">
+  <thead>
+    <tr>
+      <th>اسم السيارة</th>
+      <th>نوع السيارة</th>
+      <th>لوحة الترقيم</th>
+      <th>إجراءات</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const carsTableBody = document.querySelector("#carsTable tbody");
+
+  // تحميل البيانات من localStorage
+  let cars = JSON.parse(localStorage.getItem("cars") || "[]");
+  const reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+
+  // فقط السيارات غير المحجوزة
+  const reservedPlates = reservations.map(r => r.car.plate);
+  cars = cars.filter(car => !reservedPlates.includes(car.plate));
+
+  function renderTable() {
+    carsTableBody.innerHTML = "";
+    cars.forEach((car, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="name">${car.name}</td>
+        <td class="type">${car.type}</td>
+        <td class="plate">${car.plate}</td>
+        <td>
+          <button class="edit">تعديل</button>
+          <button class="delete">حذف</button>
+        </td>
+      `;
+
+      const editBtn = row.querySelector(".edit");
+      const deleteBtn = row.querySelector(".delete");
+
+      let isEditing = false;
+
+      editBtn.onclick = () => {
+        if (!isEditing) {
+          // تفعيل التعديل: استبدال الخلايا بحقول إدخال
+          const nameCell = row.querySelector(".name");
+          const typeCell = row.querySelector(".type");
+          // plate لا نسمح بتعديله لأنه معرف فريد، لكن لو تريد أضيف تعديل له
+          const plateCell = row.querySelector(".plate");
+
+          nameCell.innerHTML = `<input type="text" value="${car.name}" style="width: 100%; padding: 4px; font-size:16px;" />`;
+          typeCell.innerHTML = `<input type="text" value="${car.type}" style="width: 100%; padding: 4px; font-size:16px;" />`;
+          // plate غير قابل للتعديل، نتركه كما هو
+
+          editBtn.textContent = "حفظ";
+          editBtn.classList.remove("edit");
+          editBtn.classList.add("save");
+          isEditing = true;
+        } else {
+          // حفظ التعديلات
+          const nameInput = row.querySelector(".name input").value.trim();
+          const typeInput = row.querySelector(".type input").value.trim();
+
+          if(nameInput === "" || typeInput === ""){
+            alert("الرجاء ملء جميع الحقول.");
+            return;
+          }
+
+          // تحديث البيانات في المصفوفة
+          car.name = nameInput;
+          car.type = typeInput;
+
+          // تحديث localStorage
+          localStorage.setItem("cars", JSON.stringify(cars));
+
+          // تحديث الصف للعرض فقط
+          row.querySelector(".name").textContent = car.name;
+          row.querySelector(".type").textContent = car.type;
+
+          editBtn.textContent = "تعديل";
+          editBtn.classList.remove("save");
+          editBtn.classList.add("edit");
+          isEditing = false;
+
+          alert("تم حفظ التعديلات");
+        }
+      };
+
+      deleteBtn.onclick = () => {
+        if(confirm(`هل تريد حذف السيارة ${car.name} - ${car.plate}؟`)){
+          cars.splice(index, 1);
+          localStorage.setItem("cars", JSON.stringify(cars));
+          renderTable();
+        }
+      };
+
+      carsTableBody.appendChild(row);
+    });
+
+    if(cars.length === 0){
+      carsTableBody.innerHTML = `<tr><td colspan="4" style="padding:20px; text-align:center; color:#777;">لا توجد سيارات متوفرة حاليا</td></tr>`;
+    }
+  }
+
+  renderTable();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل الدخول</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #fef9c3, #fde68a);
+      margin: 0; padding: 20px;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      color: #92400e;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #f59e0b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    .link {
+      margin-top: 12px;
+      text-align: center;
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    #langSwitch {
+      position: fixed;
+      top: 10px; left: 10px;
+      background: #92400e;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body><div id="langSwitch">Français</div><h1 id="pageTitle">تسجيل الدخول</h1><form id="loginForm">
+  <label id="labelUser">اسم المستخدم</label>
+  <input type="text" id="username" required /><label id="labelPass">كلمة المرور</label> <input type="password" id="password" required />
+
+<button type="submit" id="loginBtn">دخول</button>
+
+</form><div class="link" onclick="location.href='add-user.html'" id="addUserLink">إنشاء مستخدم جديد</div>
+<div class="link" onclick="location.href='change-password.html'" id="changePassLink">تغيير كلمة المرور</div><script>
+  const texts = {
+    ar: {
+      langSwitch: 'Français',
+      pageTitle: 'تسجيل الدخول',
+      labelUser: 'اسم المستخدم',
+      labelPass: 'كلمة المرور',
+      loginBtn: 'دخول',
+      addUserLink: 'إنشاء مستخدم جديد',
+      changePassLink: 'تغيير كلمة المرور',
+      loginError: 'اسم المستخدم أو كلمة المرور غير صحيحة!',
+      welcome: 'مرحباً بك!'
+    },
+    fr: {
+      langSwitch: 'العربية',
+      pageTitle: "Connexion",
+      labelUser: "Nom d'utilisateur",
+      labelPass: "Mot de passe",
+      loginBtn: 'Se connecter',
+      addUserLink: 'Créer un nouvel utilisateur',
+      changePassLink: 'Changer le mot de passe',
+      loginError: "Nom d'utilisateur ou mot de passe incorrect !",
+      welcome: 'Bienvenue !'
+    }
+  };
+
+  let currentLang = localStorage.getItem('lang') || 'ar';
+
+  function applyLang() {
+    const t = texts[currentLang];
+    document.getElementById('langSwitch').textContent = t.langSwitch;
+    document.getElementById('pageTitle').textContent = t.pageTitle;
+    document.getElementById('labelUser').textContent = t.labelUser;
+    document.getElementById('labelPass').textContent = t.labelPass;
+    document.getElementById('loginBtn').textContent = t.loginBtn;
+    document.getElementById('addUserLink').textContent = t.addUserLink;
+    document.getElementById('changePassLink').textContent = t.changePassLink;
+    document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  document.getElementById('langSwitch').onclick = () => {
+    currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+    localStorage.setItem('lang', currentLang);
+    applyLang();
+  };
+
+  applyLang();
+
+  document.getElementById('loginForm').onsubmit = function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    const found = users.find(u => u.username === username && u.password === password);
+
+    if (found) {
+      alert(texts[currentLang].welcome);
+      location.href = 'home.html'; // يمكنك تغييره للصفحة التالية بعد الدخول
+    } else {
+      alert(texts[currentLang].loginError);
+    }
+  };
+</script></body>
+</html>

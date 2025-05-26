@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>حجز سيارة</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #fff3e0);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      color: #00695c;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: #ffffffdd;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00897b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #backBtn, #langBtn {
+      position: fixed;
+      top: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #backBtn {
+      left: 10px;
+      background: #004d40;
+      color: white;
+    }
+    #langBtn {
+      left: 120px;
+      background: #00796b;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<button id="backBtn" onclick="location.href='home.html'">الرئيسية</button>
+<button id="langBtn" onclick="switchLang()">Français</button>
+
+<h1 id="pageTitle">حجز سيارة</h1>
+
+<form id="reserveForm">
+  <label id="carLabel">اختر السيارة</label>
+  <select id="carSelect" required></select>
+
+  <label id="startLabel">تاريخ الحجز</label>
+  <input type="date" id="startDate" required>
+
+  <label id="endLabel">تاريخ نهاية الحجز</label>
+  <input type="date" id="endDate" required>
+
+  <label id="priceLabel">ثمن الحجز</label>
+  <input type="number" id="price" required>
+
+  <label id="nameLabel">اسم السائق</label>
+  <input type="text" id="driverName" required>
+
+  <label id="idLabel">رقم البطاقة الوطنية</label>
+  <input type="text" id="idNumber" required>
+
+  <label id="licenseLabel">رقم رخصة السياقة</label>
+  <input type="text" id="licenseNumber" required>
+
+  <button type="submit" id="reserveBtn">تأكيد الحجز</button>
+</form>
+
+<script>
+  const texts = {
+    ar: {
+      langBtn: 'Français',
+      pageTitle: 'حجز سيارة',
+      carLabel: 'اختر السيارة',
+      startLabel: 'تاريخ الحجز',
+      endLabel: 'تاريخ نهاية الحجز',
+      priceLabel: 'ثمن الحجز',
+      nameLabel: 'اسم السائق',
+      idLabel: 'رقم البطاقة الوطنية',
+      licenseLabel: 'رقم رخصة السياقة',
+      reserveBtn: 'تأكيد الحجز',
+      success: 'تم الحجز بنجاح!'
+    },
+    fr: {
+      langBtn: 'العربية',
+      pageTitle: 'Réserver une voiture',
+      carLabel: 'Choisir une voiture',
+      startLabel: 'Date de début',
+      endLabel: 'Date de fin',
+      priceLabel: 'Prix de la réservation',
+      nameLabel: 'Nom du conducteur',
+      idLabel: 'Numéro CIN',
+      licenseLabel: 'Numéro de permis',
+      reserveBtn: 'Confirmer la réservation',
+      success: 'Réservation réussie !'
+    }
+  };
+
+  let lang = localStorage.getItem('lang') || 'ar';
+
+  function applyLang() {
+    const t = texts[lang];
+    document.getElementById('langBtn').textContent = t.langBtn;
+    document.getElementById('pageTitle').textContent = t.pageTitle;
+    document.getElementById('carLabel').textContent = t.carLabel;
+    document.getElementById('startLabel').textContent = t.startLabel;
+    document.getElementById('endLabel').textContent = t.endLabel;
+    document.getElementById('priceLabel').textContent = t.priceLabel;
+    document.getElementById('nameLabel').textContent = t.nameLabel;
+    document.getElementById('idLabel').textContent = t.idLabel;
+    document.getElementById('licenseLabel').textContent = t.licenseLabel;
+    document.getElementById('reserveBtn').textContent = t.reserveBtn;
+    document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  function switchLang() {
+    lang = lang === 'ar' ? 'fr' : 'ar';
+    localStorage.setItem('lang', lang);
+    applyLang();
+  }
+
+  applyLang();
+
+  // تحميل السيارات غير المحجوزة
+  const carSelect = document.getElementById("carSelect");
+  const cars = JSON.parse(localStorage.getItem("cars") || "[]");
+  const reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+  const reservedPlates = reservations.map(r => r.car.plate);
+
+  cars
+    .filter(car => !reservedPlates.includes(car.plate))
+    .forEach(car => {
+      const opt = document.createElement("option");
+      opt.value = car.plate;
+      opt.textContent = `${car.name} - ${car.type} - ${car.plate}`;
+      carSelect.appendChild(opt);
+    });
+
+  // حفظ الحجز مع معلومات السيارة الكاملة
+  document.getElementById("reserveForm").onsubmit = function(e) {
+    e.preventDefault();
+    const selectedCar = cars.find(c => c.plate === carSelect.value);
+    const reservation = {
+      car: {
+        name: selectedCar.name,
+        type: selectedCar.type,
+        plate: selectedCar.plate
+      },
+      startDate: document.getElementById("startDate").value,
+      endDate: document.getElementById("endDate").value,
+      price: document.getElementById("price").value,
+      driverName: document.getElementById("driverName").value,
+      idNumber: document.getElementById("idNumber").value,
+      licenseNumber: document.getElementById("licenseNumber").value,
+      timestamp: Date.now()
+    };
+    const reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+    reservations.push(reservation);
+    localStorage.setItem("reservations", JSON.stringify(reservations));
+    alert(texts[lang].success);
+    location.href = "home.html";
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>أرشيف الحجز</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #e3f2fd);
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    h1 {
+      text-align: center;
+      color: #880e4f;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f06292;
+      color: white;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin: 2px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .edit {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .delete {
+      background-color: #f44336;
+      color: white;
+    }
+
+    #backBtn, #langBtn {
+      position: fixed;
+      top: 10px;
+      padding: 10px 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #backBtn {
+      left: 10px;
+      background-color: #3f51b5;
+      color: white;
+    }
+
+    #langBtn {
+      left: 140px;
+      background-color: #009688;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<button id="backBtn" onclick="location.href='home.html'">الرئيسية</button>
+<button id="langBtn" onclick="switchLang()">Français</button>
+
+<h1 id="pageTitle">أرشيف الحجز</h1>
+
+<table id="reservationsTable">
+  <thead>
+    <tr>
+      <th>اسم السيارة</th>
+      <th>نوع السيارة</th>
+      <th>لوحة الترقيم</th>
+      <th>تاريخ البداية</th>
+      <th>تاريخ النهاية</th>
+      <th>الثمن</th>
+      <th>اسم السائق</th>
+      <th>رقم البطاقة</th>
+      <th>رخصة السياقة</th>
+      <th>إجراءات</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const texts = {
+    ar: {
+      langBtn: 'Français',
+      pageTitle: 'أرشيف الحجز',
+      edit: 'تعديل',
+      save: 'حفظ',
+      del: 'حذف',
+      confirmDel: 'هل تريد حذف هذا الحجز؟',
+      saved: 'تم الحفظ بنجاح'
+    },
+    fr: {
+      langBtn: 'العربية',
+      pageTitle: 'Archive des réservations',
+      edit: 'Modifier',
+      save: 'Enregistrer',
+      del: 'Supprimer',
+      confirmDel: 'Voulez-vous supprimer cette réservation ?',
+      saved: 'Modifications enregistrées'
+    }
+  };
+
+  let lang = localStorage.getItem('lang') || 'ar';
+
+  function applyLang() {
+    const t = texts[lang];
+    document.getElementById('langBtn').textContent = t.langBtn;
+    document.getElementById('pageTitle').textContent = t.pageTitle;
+    document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    loadTable();
+  }
+
+  function switchLang() {
+    lang = lang === 'ar' ? 'fr' : 'ar';
+    localStorage.setItem('lang', lang);
+    applyLang();
+  }
+
+  function loadTable() {
+    const tbody = document.querySelector("#reservationsTable tbody");
+    tbody.innerHTML = "";
+
+    const reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+
+    reservations.forEach((r, index) => {
+      const car = r.car || {};
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${car.name || ''}</td>
+        <td>${car.type || ''}</td>
+        <td>${car.plate || ''}</td>
+        <td>${r.startDate}</td>
+        <td>${r.endDate}</td>
+        <td>${r.price}</td>
+        <td>${r.driverName}</td>
+        <td>${r.idNumber}</td>
+        <td>${r.licenseNumber}</td>
+        <td>
+          <button class="edit">${texts[lang].edit}</button>
+          <button class="delete">${texts[lang].del}</button>
+        </td>
+      `;
+
+      const cells = row.querySelectorAll("td");
+      const editBtn = row.querySelector(".edit");
+      const deleteBtn = row.querySelector(".delete");
+
+      let isEditing = false;
+
+      editBtn.onclick = () => {
+        if (!isEditing) {
+          // تفعيل التحرير
+          for (let i = 0; i < cells.length - 1; i++) {
+            cells[i].setAttribute("contenteditable", "true");
+            cells[i].style.backgroundColor = "#fff3e0";
+          }
+          editBtn.textContent = texts[lang].save;
+          isEditing = true;
+        } else {
+          // حفظ التعديلات
+          const updatedReservation = {
+            car: {
+              name: cells[0].textContent.trim(),
+              type: cells[1].textContent.trim(),
+              plate: cells[2].textContent.trim()
+            },
+            startDate: cells[3].textContent.trim(),
+            endDate: cells[4].textContent.trim(),
+            price: cells[5].textContent.trim(),
+            driverName: cells[6].textContent.trim(),
+            idNumber: cells[7].textContent.trim(),
+            licenseNumber: cells[8].textContent.trim(),
+            timestamp: r.timestamp
+          };
+
+          const reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+          reservations[index] = updatedReservation;
+          localStorage.setItem("reservations", JSON.stringify(reservations));
+
+          alert(texts[lang].saved);
+
+          for (let i = 0; i < cells.length - 1; i++) {
+            cells[i].removeAttribute("contenteditable");
+            cells[i].style.backgroundColor = "";
+          }
+          editBtn.textContent = texts[lang].edit;
+          isEditing = false;
+        }
+      };
+
+      deleteBtn.onclick = () => {
+        if (confirm(texts[lang].confirmDel)) {
+          const reservations = JSON.parse(localStorage.getItem("reservations") || "[]");
+          reservations.splice(index, 1);
+          localStorage.setItem("reservations", JSON.stringify(reservations));
+          loadTable();
+        }
+      };
+
+      tbody.appendChild(row);
+    });
+  }
+
+  applyLang();
+</script>
+
+</body>
+</html>

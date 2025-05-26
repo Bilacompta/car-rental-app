@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>إضافة مستخدم جديد</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to left, #e0f7fa, #f1f8e9);
+      margin: 0; padding: 20px;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      max-width: 400px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      width: 100%;
+    }
+    button:hover {
+      background: #059669;
+    }
+    #message {
+      text-align: center;
+      margin-top: 10px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<h1>إضافة مستخدم جديد</h1>
+
+<form id="registerForm">
+  <label for="newUsername">اسم المستخدم</label>
+  <input type="text" id="newUsername" required>
+
+  <label for="newPassword">كلمة المرور</label>
+  <input type="password" id="newPassword" required>
+
+  <button type="submit">إنشاء المستخدم</button>
+</form>
+
+<div id="message"></div>
+
+<script>
+  document.getElementById("registerForm").onsubmit = function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("newUsername").value.trim();
+    const password = document.getElementById("newPassword").value.trim();
+    const message = document.getElementById("message");
+
+    if (!username || !password) {
+      message.textContent = "يرجى إدخال جميع الحقول.";
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+    const exists = users.some(u => u.username === username);
+    if (exists) {
+      message.textContent = "اسم المستخدم موجود بالفعل.";
+      return;
+    }
+
+    users.push({ username, password });
+    localStorage.setItem("users", JSON.stringify(users));
+
+    message.style.color = "green";
+    message.textContent = "تم إنشاء المستخدم بنجاح.";
+    // يمكن توجيه المستخدم لصفحة تسجيل الدخول بعد 1.5 ثانية:
+    // setTimeout(() => location.href = "login.html", 1500);
+  };
+</script>
+
+</body>
+</html>
