@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>تعديل المستخدم</title>
+  <meta charset="UTF-8" />
+  <title>إضافة مستخدم جديد</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #fef9c3, #fde68a);
+      background: linear-gradient(to right, #c8e6c9, #a5d6a7);
       margin: 0; padding: 20px;
       direction: rtl;
     }
-    h1 { text-align: center; color: #b45309; }
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+    }
     form {
       max-width: 400px;
       margin: auto;
@@ -34,7 +37,7 @@
     button {
       width: 100%;
       padding: 12px;
-      background: #b45309;
+      background: #388e3c;
       color: white;
       border: none;
       border-radius: 8px;
@@ -42,17 +45,10 @@
       margin-top: 15px;
       cursor: pointer;
     }
-    .link {
-      margin-top: 10px;
-      text-align: center;
-      color: #2563eb;
-      cursor: pointer;
-      text-decoration: underline;
-    }
     #langSwitch {
       position: fixed;
       top: 10px; left: 10px;
-      background: #b45309;
+      background: #2e7d32;
       color: white;
       padding: 6px 12px;
       border-radius: 6px;
@@ -62,96 +58,88 @@
   </style>
 </head>
 <body>
+  <div id="langSwitch">Français</div>
+  <h1 id="pageTitle">إضافة مستخدم جديد</h1>
+  <form id="addUserForm">
+    <label id="labelUser">اسم المستخدم</label>
+    <input type="text" id="username" required />
+    <label id="labelPass">كلمة المرور</label>
+    <input type="password" id="password" required />
+    <label id="labelPassConfirm">تأكيد كلمة المرور</label>
+    <input type="password" id="passwordConfirm" required />
+    <button type="submit" id="addUserBtn">إضافة المستخدم</button>
+  </form>
 
-<div id="langSwitch">Français</div>
+  <script>
+    const texts = {
+      ar: {
+        langSwitch: 'Français',
+        pageTitle: 'إضافة مستخدم جديد',
+        labelUser: 'اسم المستخدم',
+        labelPass: 'كلمة المرور',
+        labelPassConfirm: 'تأكيد كلمة المرور',
+        addUserBtn: 'إضافة المستخدم',
+        success: 'تم إضافة المستخدم بنجاح!',
+        passMismatch: 'كلمة المرور وتأكيدها غير متطابقين!',
+        userExists: 'اسم المستخدم موجود مسبقاً!'
+      },
+      fr: {
+        langSwitch: 'العربية',
+        pageTitle: "Ajouter un nouvel utilisateur",
+        labelUser: "Nom d'utilisateur",
+        labelPass: "Mot de passe",
+        labelPassConfirm: "Confirmer le mot de passe",
+        addUserBtn: "Ajouter l'utilisateur",
+        success: "Utilisateur ajouté avec succès !",
+        passMismatch: "Le mot de passe et sa confirmation ne correspondent pas !",
+        userExists: "Le nom d'utilisateur existe déjà !"
+      }
+    };
 
-<h1 id="pageTitle">تعديل معلومات المستخدم</h1>
+    let currentLang = localStorage.getItem('lang') || 'ar';
 
-<form id="editForm">
-  <label id="labelOldUser">اسم المستخدم الحالي</label>
-  <input type="text" id="oldUsername" required />
-
-  <label id="labelNewUser">اسم المستخدم الجديد</label>
-  <input type="text" id="newUsername" />
-
-  <label id="labelNewPass">كلمة المرور الجديدة</label>
-  <input type="password" id="newPassword" />
-
-  <button type="submit" id="updateBtn">تحديث</button>
-</form>
-
-<div class="link" onclick="location.href='index.html'" id="backLink">العودة لتسجيل الدخول</div>
-
-<script>
-  const texts = {
-    ar: {
-      langSwitch: 'Français',
-      pageTitle: 'تعديل معلومات المستخدم',
-      labelOldUser: 'اسم المستخدم الحالي',
-      labelNewUser: 'اسم المستخدم الجديد',
-      labelNewPass: 'كلمة المرور الجديدة',
-      updateBtn: 'تحديث',
-      backLink: 'العودة لتسجيل الدخول',
-      userNotFound: 'المستخدم غير موجود!',
-      updated: 'تم التحديث بنجاح.'
-    },
-    fr: {
-      langSwitch: 'العربية',
-      pageTitle: 'Modifier utilisateur',
-      labelOldUser: "Nom d'utilisateur actuel",
-      labelNewUser: "Nouveau nom d'utilisateur",
-      labelNewPass: 'Nouveau mot de passe',
-      updateBtn: 'Mettre à jour',
-      backLink: 'Retour à la connexion',
-      userNotFound: "Utilisateur introuvable !",
-      updated: 'Mis à jour avec succès.'
+    function applyLang() {
+      const t = texts[currentLang];
+      document.getElementById('langSwitch').textContent = t.langSwitch;
+      document.getElementById('pageTitle').textContent = t.pageTitle;
+      document.getElementById('labelUser').textContent = t.labelUser;
+      document.getElementById('labelPass').textContent = t.labelPass;
+      document.getElementById('labelPassConfirm').textContent = t.labelPassConfirm;
+      document.getElementById('addUserBtn').textContent = t.addUserBtn;
+      document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
     }
-  };
 
-  let currentLang = localStorage.getItem('lang') || 'ar';
+    document.getElementById('langSwitch').onclick = () => {
+      currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+      localStorage.setItem('lang', currentLang);
+      applyLang();
+    };
 
-  function applyLang() {
-    const t = texts[currentLang];
-    document.getElementById('langSwitch').textContent = t.langSwitch;
-    document.getElementById('pageTitle').textContent = t.pageTitle;
-    document.getElementById('labelOldUser').textContent = t.labelOldUser;
-    document.getElementById('labelNewUser').textContent = t.labelNewUser;
-    document.getElementById('labelNewPass').textContent = t.labelNewPass;
-    document.getElementById('updateBtn').textContent = t.updateBtn;
-    document.getElementById('backLink').textContent = t.backLink;
-    document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-  }
-
-  document.getElementById('langSwitch').onclick = () => {
-    currentLang = currentLang === 'ar' ? 'fr' : 'ar';
-    localStorage.setItem('lang', currentLang);
     applyLang();
-  };
 
-  applyLang();
+    document.getElementById('addUserForm').onsubmit = function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const passwordConfirm = document.getElementById('passwordConfirm').value;
 
-  document.getElementById('editForm').onsubmit = function(e) {
-    e.preventDefault();
-    const oldUsername = document.getElementById('oldUsername').value.trim();
-    const newUsername = document.getElementById('newUsername').value.trim();
-    const newPassword = document.getElementById('newPassword').value.trim();
+      if (password !== passwordConfirm) {
+        alert(texts[currentLang].passMismatch);
+        return;
+      }
 
-    let users = JSON.parse(localStorage.getItem('users') || '[]');
-    const userIndex = users.findIndex(u => u.username === oldUsername);
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
 
-    if (userIndex === -1) {
-      alert(texts[currentLang].userNotFound);
-      return;
-    }
+      if(users.some(u => u.username === username)) {
+        alert(texts[currentLang].userExists);
+        return;
+      }
 
-    if (newUsername) users[userIndex].username = newUsername;
-    if (newPassword) users[userIndex].password = newPassword;
-
-    localStorage.setItem('users', JSON.stringify(users));
-    alert(texts[currentLang].updated);
-    location.href = 'index.html';
-  };
-</script>
-
+      users.push({ username, password });
+      localStorage.setItem('users', JSON.stringify(users));
+      alert(texts[currentLang].success);
+      location.href = 'login.html'; // الرجوع لصفحة تسجيل الدخول
+    };
+  </script>
 </body>
 </html>
